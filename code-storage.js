@@ -24,8 +24,8 @@ server = require('http').createServer((req, res) => {
       }
     });
   } else {
-    if(req.url === '/icon.png') {
-      res.end(require('fs').readFileSync('icon.png'));
+    if(req.url === '/icon.png' || req.url === '/README.md' || req.url === '/index.html') {
+      res.end(require('fs').readFileSync(req.url.slice(1)));
       return;
     }
     var id = req.url.slice(1);

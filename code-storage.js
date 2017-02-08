@@ -1,5 +1,6 @@
 var levelup = require('levelup');
 var db = require('levelup')('./data');
+var sha256 = require('js-sha256');
 
 var time = 0;
 server = require('http').createServer((req, res) => {
@@ -7,17 +8,12 @@ server = require('http').createServer((req, res) => {
     var data = '';
     req.on('data', chunk => data += chunk.toString());
     req.on('end', () => {
-      // make id, combining unique timestamp, and ip-address
-      var ip = req.headers['x-real-ip'] || '0.0.0.0';
-      ip = ip.split('.').map(Number);
-      ip = Math.pow(36,7) + (ip[0] * 256 * 65536) + (ip[1] * 65536) + (ip[2] * 256) + ip[3]
-      time = Math.max(Date.now(), time + 1);
-      var id = time.toString(36) + ip.toString(36).slice(1);
       if(data.length > 60000) {
         console.log('big data.length', data.length, id);
         res.statusCode = 413;
         res.end();
       } else {
+        var id = sha256(data).slice(0,24);
         db.put(id, data, err => {
           if(err) {
             console.log(err);

@@ -24,6 +24,10 @@ server = require('http').createServer((req, res) => {
       }
     });
   } else {
+    if(req.url === '/icon.png') {
+      res.end(require('fs').readFileSync('icon.png'));
+      return;
+    }
     var id = req.url.slice(1);
     db.get(id, (err, val) => {
       if(err) {

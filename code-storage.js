@@ -4,7 +4,7 @@ var sha256 = require('js-sha256');
 
 var time = 0;
 server = require('http').createServer((req, res) => {
-  if(req.method === 'PUT') {
+  if(req.method === 'POST') {
     var data = '';
     req.on('data', chunk => data += chunk.toString());
     req.on('end', () => {

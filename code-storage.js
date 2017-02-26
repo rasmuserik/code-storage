@@ -1,6 +1,5 @@
 var levelup = require('levelup');
 var db = require('levelup')('./data');
-var sha256 = require('js-sha256');
 
 var time = 0;
 server = require('http').createServer((req, res) => {
@@ -15,11 +14,18 @@ server = require('http').createServer((req, res) => {
       req.on('data', chunk => data += chunk.toString());
       req.on('end', () => {
         if(data.length > 60000) {
-          console.log('big data.length', data.length, id);
+          console.log('code-storage is only for small code files <60K. To large data.length ', data.length, id);
           res.statusCode = 413;
           res.end();
         } else {
-          var id =  sha256(data).slice(0,24);
+
+          var id = require('crypto')
+            .createHash('sha256')
+            .update(data, 'binary')
+            .digest('base64')
+            .replace(/[+]/g, '-')
+            .replace(/[/]/g, '_')
+            .slice(0,24);
           db.put(id, data, err => {
             if(err) {
               console.log(err);
